@@ -23,9 +23,8 @@ def midi_note_to_name(note: int):
 
 midiin = MidiIn()
 midiin.open_port()  # Get messages from default port
-
+#msg is split into 3,1.keypressed[144] or released[released], 2.note, 3.velocity
 def callback(msg: list, timestamp: float):
-
     simul_click_time = 0.05
     # message is a list of 1-byte strings
     # timestamp is a float with the time elapsed since the previous message
@@ -41,6 +40,14 @@ def callback(msg: list, timestamp: float):
         value = msg[2]
         print(f"Control Change: Channel {channel}, Controller {controller}, Value {value}")
 midiin.callback = callback
+
+
+
+
+
+
+
+
 
 try:
     print("Listening for MIDI input... Press Ctrl-C to exit.")
