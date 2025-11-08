@@ -5,7 +5,14 @@ class MIDIReader:
     def __init__(self,):
         self.active_keys = set()
         self.midiin = MidiIn()
-        self.midiin.open_port()  # Get messages from default port
+        try:
+            self.midiin.open_port()  # Get messages from default port
+        except Exception as e:
+            print(f"Error opening MIDI port: {e}")
+
+        # background thread control
+        self._running = False
+        self._thread = None
         self.chords = {
     (69, 73, 76): "A Major",
     (69, 72, 76): "A Minor",
@@ -32,20 +39,6 @@ class MIDIReader:
     (66, 70, 73): "Gb Major",
     (66, 69, 73): "Gb Minor"
 }
-        self.all_chords = {
-    "A Major": [69, 73, 76], "A Minor": [69, 72, 76],
-    "B Major": [71, 75, 78], "B Minor": [71, 74, 78],
-    "C Major": [60, 64, 67], "C Minor": [60, 63, 67],
-    "D Major": [62, 66, 69], "D Minor": [62, 65, 69],
-    "E Major": [64, 68, 71], "E Minor": [64, 67, 71],
-    "F Major": [65, 69, 72], "F Minor": [65, 68, 72],
-    "G Major": [67, 71, 74], "G Minor": [67, 70, 74],
-    "Ab Major": [68, 72, 75], "Ab Minor": [68, 71, 75],
-    "Bb Major": [70, 74, 77], "Bb Minor": [70, 73, 77],
-    "Db Major": [61, 65, 68], "Db Minor": [61, 64, 68],
-    "Eb Major": [63, 67, 70], "Eb Minor": [63, 66, 70],
-    "Gb Major": [66, 70, 73], "Gb Minor": [66, 69, 73]
-}
         self.NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
     def midi_note_to_name(self,note: int):
@@ -59,17 +52,17 @@ class MIDIReader:
             return ''
         name = self.NOTE_NAMES[n % 12]
         return f"{name}"
+    
     def check_chord(self):
-        keys_list = list(self.active_keys)
-        keys_list.sort()
-        print(f"Current active keys for chord detection: {keys_list}")
-        chords = self.all_chords.values()
-        if keys_list in chords:
-            chord = [name for name, notes in self.all_chords.items() if notes == keys_list][0]
-            print(f"Detected Chord: {chord}")
-    def callback(self,msg: list, timestamp: float):
-        time.sleep(0.01)
+        if not self.active_keys:
+            return
+        key = tuple(sorted(self.active_keys))
+        if key in self.chords:
+            #print("chord detected")
+            #print(f"Detected Chord: {self.chords[key]}")
+            return self.chords[key]
 
+    def callback(self,msg: list, timestamp: float):
         # message is a list of 1-byte strings
         # timestamp is a float with the time elapsed since the previous message
         msgtype, channel = splitchannel(msg[0])
@@ -83,7 +76,7 @@ class MIDIReader:
             if msg[1] in self.active_keys:
                 self.active_keys.remove(msg[1])
 
-        print(f"Active keys: {[self.midi_note_to_name(n) for n in self.active_keys]}")
+       # print(f"Active keys: {[self.midi_note_to_name(n) for n in self.active_keys]}")
         self.check_chord()
 ##############IGNORE FOR NOW##############
     # elif msgtype == CC:
@@ -93,15 +86,32 @@ class MIDIReader:
     def start_listening(self):
         self.midiin.callback = self.callback
 
+        if self._running:
+            # already running
+            return
 
+        self._running = True
 
-        try:
-            print("Listening for MIDI input... Press Ctrl-C to exit.")
-            while True:
-                pass  # Keep the script running to listen for MIDI messages
-        except KeyboardInterrupt:
-            print("Exiting...")
-            self.midiin.close_port()
+        def _loop():
+            try:
+                print("Listening for MIDI input (background)... Press stop to exit.")
+                while self._running:
+                    time.sleep(0.1)
+            finally:
+                try:
+                    self.midiin.close_port()
+                except Exception:
+                    pass
 
-piano = MIDIReader()
-piano.start_listening()
+        import threading
+        self._thread = threading.Thread(target=_loop, daemon=True)
+        self._thread.start()
+
+    def stop_listening(self):
+        if not self._running:
+            return
+        self._running = False
+        # give the thread a moment to finish
+        if self._thread is not None:
+            self._thread.join(timeout=1.0)
+            self._thread = None
