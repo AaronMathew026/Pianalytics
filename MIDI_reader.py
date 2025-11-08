@@ -38,7 +38,29 @@ class MIDIReader:
     (63, 66, 70): "Eb Minor",
     (66, 70, 73): "Gb Major",
     (66, 69, 73): "Gb Minor"
-}
+    }       
+        self.scales = {
+        "C Major":   (60, 62, 64, 65, 67, 69, 71),
+        "C Minor":   (60, 62, 63, 65, 67, 68, 71),
+        "D Major":   (62, 64, 66, 67, 69, 71, 73),
+        "D Minor":   (62, 64, 65, 67, 69, 70, 73),
+        "E Major":   (64, 66, 68, 69, 71, 73, 76),
+        "E Minor":   (64, 66, 67, 69, 71, 72, 76),
+        "F Major":   (65, 67, 69, 70, 72, 74, 77),
+        "F Minor":   (65, 67, 68, 70, 72, 73, 77),
+        "G Major":   (67, 69, 71, 72, 74, 76, 79),
+        "G Minor":   (67, 69, 70, 72, 74, 75, 79),
+        "Ab Major":  (68, 70, 72, 73, 75, 77, 80),
+        "Ab Minor":  (68, 70, 71, 73, 75, 76, 80),
+        "Bb Major":  (70, 72, 74, 75, 77, 79, 82),
+        "Bb Minor":  (70, 72, 73, 75, 77, 78, 82),
+        "Db Major":  (61, 63, 65, 66, 68, 70, 73),
+        "Db Minor":  (61, 63, 64, 66, 68, 69, 73),
+        "Eb Major":  (63, 65, 67, 68, 70, 72, 75),
+        "Eb Minor":  (63, 65, 66, 68, 70, 71, 75),
+        "Gb Major":  (66, 68, 70, 71, 73, 75, 78),
+        "Gb Minor":  (66, 68, 69, 71, 73, 74, 78),
+    }
         self.NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
 
     def midi_note_to_name(self,note: int):
@@ -61,6 +83,22 @@ class MIDIReader:
             #print("chord detected")
             #print(f"Detected Chord: {self.chords[key]}")
             return self.chords[key]
+    def check_scale(self,scale):
+        notes= list(scale)
+        while True:
+                if len(scale) == 0:
+                    print("Scale completed!")
+                    return True
+                current_key_to_play = notes.pop(0)
+                print(f"Please play the next note in the scale: {self.midi_note_to_name(current_key_to_play)}")
+                if not self.active_keys:
+                    if self.active_keys.pop(0) == current_key_to_play:
+                        print("Correct note played in scale!")
+                    else:
+                        print("Incorrect note played in scale.")
+                        return False
+
+
 
     def callback(self,msg: list, timestamp: float):
         # message is a list of 1-byte strings

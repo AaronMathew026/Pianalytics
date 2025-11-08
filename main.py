@@ -27,7 +27,7 @@ class Main:
             elif self.user_input == "2":
                 print("Scale Practice mode selected.")
                 self.mode = "Scale Practice"
-                #self.scale_practice()
+                self.scale_practice()
             elif self.user_input == "3":
                 print("Real-time Analysis mode selected.")
                 self.mode = "Real-time Analysis"
@@ -44,7 +44,7 @@ class Main:
         elif self.user_input == "3":
             print("Exiting Pianalytics. Goodbye!")
             exit() 
-            
+
     def chord_practice(self):
         self.piano.start_listening()
         chords = self.piano.chords.values()
@@ -67,6 +67,25 @@ class Main:
                 game_active = True
             elif user_input == "n":
                 game_active = False
+                self.piano.stop_listening()
+                print("Exiting Chord Practice mode.")
+                self.main()
+    def scale_practice(self):
+        scales = list(self.piano.scales.keys())
+        game_active = True
+        self.piano.start_listening()
+        while game_active:
+            new_scale = random.choice(scales)
+            notes_in_scale = self.piano.scales[new_scale]
+            scale_played = False
+            while not scale_played:
+                print(f"Please play the following scale: {new_scale}")
+                if self.piano.check_scale(notes_in_scale):
+                    print("Correct scale played!")
+                    scale_played = True
+                else:
+                    print("Incorrect scale. Try again.")
+                
 
 if __name__ == "__main__":
     app = Main()
