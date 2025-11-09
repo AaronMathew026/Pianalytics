@@ -3,6 +3,16 @@ import mido
 from rtmidi2 import MidiIn, NOTEON, CC, splitchannel
 import time
 import random
+
+def grab_user_input(prompt,):
+    user_input = (input(prompt)).lower()
+    while user_input not in ("y", "n"):
+        user_input = input(f"Invalid option. Please select y or n: \n")
+    if user_input == "y":
+        return True
+    else:
+        return False
+
 class Main:
     def __init__(self):
         self.mode = "home"
@@ -52,20 +62,20 @@ class Main:
         while game_active:
             new_chord = random.choice(list(chords))
             print(f"Please play the following chord: {new_chord}")
+            if grab_user_input("would you like to see the chord notes? (y/n): \n"):
+                keys = [key for key, value in self.piano.chords.items() if value == new_chord][0]
+                print("KEYS: ",keys)
+                notes = [self.piano.midi_note_to_name(key) for key in keys]
+                print("NOTES: ",notes)
             chord_played = False
-
             while not chord_played:
                 if self.piano.check_chord() == new_chord:
                     print("Correct chord played!")
                     chord_played = True
-            user_input = input("Would you like to play another chord? (y/n): \n")
 
-            while user_input not in ["y", "n"]:
-                user_input = input("Invalid option. Please select 'y' or 'n': \n")
-
-            if user_input == "y":
+            if grab_user_input("would you like to play another chord? (y/n): \n"):
                 game_active = True
-            elif user_input == "n":
+            else:
                 game_active = False
                 self.piano.stop_listening()
                 print("Exiting Chord Practice mode.")

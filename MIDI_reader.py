@@ -80,8 +80,6 @@ class MIDIReader:
             return
         key = tuple(sorted(self.active_keys))
         if key in self.chords:
-            #print("chord detected")
-            #print(f"Detected Chord: {self.chords[key]}")
             return self.chords[key]
     def check_scale(self,scale):
         notes= list(scale)
@@ -92,7 +90,7 @@ class MIDIReader:
                 current_key_to_play = notes.pop(0)
                 print(f"Please play the next note in the scale: {self.midi_note_to_name(current_key_to_play)}")
                 if not self.active_keys:
-                    if self.active_keys.pop(0) == current_key_to_play:
+                    if self.active_keys.pop() == current_key_to_play:
                         print("Correct note played in scale!")
                     else:
                         print("Incorrect note played in scale.")
