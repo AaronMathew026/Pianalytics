@@ -107,13 +107,14 @@ class MIDIReader:
             note = msg[1]
             velocity = msg[2]
             note_name = self.midi_note_to_name(note)
-            #print(f"Note On: Channel {channel}, Note {note} ({note_name}), Velocity {velocity} at {timestamp:.2f}s")
+            print(f"Note On: Channel {channel}, Note {note} ({note_name}), Velocity {velocity} at {timestamp:.2f}s")
         elif msg[0] == 128: # note off 
             if msg[1] in self.active_keys:
                 self.active_keys.remove(msg[1])
 
-       # print(f"Active keys: {[self.midi_note_to_name(n) for n in self.active_keys]}")
+        print(f"Active keys: {[self.midi_note_to_name(n) for n in self.active_keys]}")
         self.check_chord()
+
 ##############IGNORE FOR NOW##############
     # elif msgtype == CC:
     #     controller = msg[1]
