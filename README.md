@@ -1,2 +1,2 @@
 # Pianalytics
-Python program which connects with your piano through MIDI and analyses your playstyle and can read MIDI files
+A Python-based MIDI analysis tool that provides real-time playstyle analysis and practice utilities for pianists. The application captures live MIDI input using rtmidi2 and mido libraries, tracking active notes to identify and validate chords and scales against its internal logic. The project features a modular design with classes for reading MIDI streams (MIDIReader) and interpreting MIDI files (MIDIFileInterpreter), offering modes for real-time analysis, chord practice, and scale practice.
