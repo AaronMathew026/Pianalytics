@@ -48,6 +48,7 @@ class Game_Select:
         self.piano.start_listening()
         while game_active:
             new_scale = random.choice(scales)
+            scales.remove(new_scale)
             notes_in_scale = self.piano.scales[new_scale]
             scale_played = False
             while not scale_played:
@@ -55,6 +56,11 @@ class Game_Select:
                 if self.piano.check_scale(notes_in_scale):
                     print("Correct scale played!")
                     scale_played = True
+                if grab_user_input("would you like to play another scale? (y/n): \n"):
+                    game_active = True
                 else:
-                    print("Incorrect scale. Try again.")
-                
+                    game_active = False
+                    self.piano.stop_listening()
+                    print("Exiting Scale Practice mode.")
+                    self.main()
+            

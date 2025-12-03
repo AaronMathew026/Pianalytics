@@ -84,18 +84,23 @@ class MIDIReader:
     def check_scale(self,scale):
         notes= list(scale)
         while True:
-                if len(scale) == 0:
+                if len(notes) == 0:
                     print("Scale completed!")
                     return True
                 current_key_to_play = notes.pop(0)
                 print(f"Please play the next note in the scale: {self.midi_note_to_name(current_key_to_play)}")
-                if not self.active_keys:
-                    if self.active_keys.pop() == current_key_to_play:
-                        print("Correct note played in scale!")
+                while True:
+                    if not self.active_keys:
+                        continue
+                    if current_key_to_play in self.active_keys:
+                        print(f"Correct! You played: {self.midi_note_to_name(current_key_to_play)}")
+                        time.sleep(0.5)  # brief pause before next note
+                        break
                     else:
-                        print("Incorrect note played in scale.")
+                        print(f"Incorrect. You played: {[self.midi_note_to_name(n) for n in self.active_keys]}. Try again.")
+                        time.sleep(0.5)  # brief pause before next note
                         return False
-
+                        
 
 
     def callback(self,msg: list, timestamp: float):
@@ -107,12 +112,12 @@ class MIDIReader:
             note = msg[1]
             velocity = msg[2]
             note_name = self.midi_note_to_name(note)
-            print(f"Note On: Channel {channel}, Note {note} ({note_name}), Velocity {velocity} at {timestamp:.2f}s")
+            #print(f"Note On: Channel {channel}, Note {note} ({note_name}), Velocity {velocity} at {timestamp:.2f}s")
         elif msg[0] == 128: # note off 
             if msg[1] in self.active_keys:
                 self.active_keys.remove(msg[1])
 
-        print(f"Active keys: {[self.midi_note_to_name(n) for n in self.active_keys]}")
+        #print(f"Active keys: {[self.midi_note_to_name(n) for n in self.active_keys]}")
         self.check_chord()
 
 ##############IGNORE FOR NOW##############
@@ -152,3 +157,4 @@ class MIDIReader:
         if self._thread is not None:
             self._thread.join(timeout=1.0)
             self._thread = None
+
