@@ -63,4 +63,7 @@ class Game_Select:
                     self.piano.stop_listening()
                     print("Exiting Scale Practice mode.")
                     self.main()
+
+    def real_time_analysis(self):
+        self.piano.start_listening()
             
