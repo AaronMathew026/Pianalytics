@@ -1,5 +1,7 @@
 import tkinter as tk
+from tkinter import filedialog
 from game_modes import Game_Select
+#from MIDI_player import play_music
 import time
 import random
 class MainWindow(tk.Tk):
@@ -34,6 +36,10 @@ class MainWindow(tk.Tk):
         self.RTA_button.config(width=25, height=2)
         self.RTA_button.pack(pady=10)
 
+        self.midi_play_button = tk.Button(self.start_window, text="MIDI Playback", command=self.midi_play_window)
+        self.midi_play_button.config(width=25, height=2)
+        self.midi_play_button.pack(pady=10)
+
     def test_window(self):
         
         self.start_window.destroy()
@@ -49,10 +55,30 @@ class MainWindow(tk.Tk):
         self.game_select.real_time_analysis()
         self.update_active_keys()
 
-        self.exit_button = tk.Button(self.test_window, text="Exit",)
+        self.exit_button = tk.Button(self.test_window, text="Exit",command = self.test_window.destroy)
         self.exit_button.config(width=20, height=2)
         self.exit_button.pack(pady=10)
 
+    def midi_play_window(self):
+        self.start_window.destroy()
+        self.midi_play_window = tk.Toplevel(self)
+        self.midi_play_window.title("MIDI Playback")
+        self.midi_play_window.geometry("400x300")
+
+        menu_bar = tk.Menu(self)
+
+        file_menu = tk.Menu(menu_bar, tearoff=0)
+        file_menu.add_command(label = "Open", command = self.file_select_window)
+        file_menu.add_separator()
+        file_menu.add_command(label = "Exit", command = self.exit_window)
+        menu_bar.add_cascade(label="File", menu=file_menu)
+        self.midi_play_window.config(menu=menu_bar)
+
+        self.midi_play_window_label = tk.Label(self.midi_play_window, text="MIDI Playback Mode", font=("Helvetica", 14))
+        self.midi_play_window_label.pack(fill="x",)
+    
+    def file_select_window():
+        pass
     def update_active_keys(self):
         keys = getattr(self.game_select.piano, 'active_keys', set()) # Grabs active keys from MIDIReader
         if keys:
