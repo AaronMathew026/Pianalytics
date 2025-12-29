@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 from game_modes import Game_Select
 #from MIDI_player import play_music
 import time
@@ -76,8 +77,23 @@ class MainWindow(tk.Tk):
 
         self.midi_play_window_label = tk.Label(self.midi_play_window, text="MIDI Playback Mode", font=("Helvetica", 14))
         self.midi_play_window_label.pack(fill="x",)
-    
-    def file_select_window():
+
+        self.song_title = tk.Label(self.midi_play_window,text = "Please Select a song")
+        self.song_title.pack(fill = "both")
+    def file_select_window(self):
+        try:
+            file_name = filedialog.askopenfilename(
+                title = "Select a MIDI file to Play",
+                filetypes=[("MIDI Files", "*.mid")]
+
+            )
+            if file_name:
+                messagebox.showinfo("Information", "File Successfully uploaded")
+                print(file_name)
+                self.song_title.config(text = f"{file_name}")
+            return True
+        except tk.TclError:
+            messagebox.showerror("Error!","This file is not supported")
         pass
     def update_active_keys(self):
         keys = getattr(self.game_select.piano, 'active_keys', set()) # Grabs active keys from MIDIReader
